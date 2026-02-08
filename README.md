@@ -1,10 +1,10 @@
 # SatShield — Parametric Insurance on Flare Network 
 
-> 🏆 Built for the Flare Network Hackathon · Main Track + Bonus Track
+>  Built for the Flare Network Hackathon · Main Track + Bonus Track
 
 SatShield is a **parametric insurance dApp** that uses Flare Network's enshrined data protocols to provide automated, trustless disaster insurance payouts. When real-world events (earthquakes, floods, droughts) exceed predefined thresholds, smart contracts automatically execute payouts — no claims process, no delays.
 
-## 🏆 Hackathon Requirements Compliance
+##  Hackathon Requirements Compliance
 
 ### MAIN TRACK — All Four Enshrined Protocols Used
 
@@ -31,7 +31,7 @@ SatShield is a **parametric insurance dApp** that uses Flare Network's enshrined
 | Impactful use case | ✅ 3-tier graded payouts, 24-72h waiting periods, basis risk transparency, full terms disclosure |
 | Developer feedback | ✅ See "Building on Flare" section below |
 
-## 🔥 Flare Protocols — Deep Integration
+## Flare Protocols — Deep Integration
 
 ### 1. FTSO (Flare Time Series Oracle)
 - **Live price feeds**: FLR/USD, BTC/USD, ETH/USD read directly from FtsoV2 on Coston2
@@ -66,7 +66,7 @@ SatShield is a **parametric insurance dApp** that uses Flare Network's enshrined
 - **On-chain verification**: FTSO for price data + FDC for disaster data
 - **Dynamic registry**: Contracts resolved via `FlareContractRegistry` — no hardcoded addresses
 
-## 🏗️ Architecture
+## Architecture
 
 ### Full-Stack Effect TS Architecture
 
@@ -99,7 +99,7 @@ SatShield implements an **Effectful Programming Core** using Effect TS on both f
 └─────────────────────┴────────────┴───────────────┘
 ```
 
-## 📦 Key Contract Addresses (Coston2)
+## Key Contract Addresses (Coston2)
 
 | Contract | Address |
 |----------|---------|
@@ -110,7 +110,7 @@ SatShield implements an **Effectful Programming Core** using Effect TS on both f
 | FXRP Token | `0x0b6A3645c240605887a5532109323A3E12273dc7` |
 | AssetManager | Resolved dynamically via registry |
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 # Install dependencies
@@ -128,7 +128,7 @@ npm run test
 2. Connect to Coston2 Testnet (auto-added by the app)
 3. Get test C2FLR from the [Coston2 Faucet](https://faucet.flare.network/coston2)
 
-## 🧪 Testing
+## Testing
 
 The project includes comprehensive automated tests for the Effect TS architecture:
 
@@ -140,7 +140,7 @@ The project includes comprehensive automated tests for the Effect TS architectur
 npm run test
 ```
 
-## 💬 Building on Flare — Developer Feedback
+## Building on Flare — Developer Feedback
 
 ### What Worked Well
 - **FlareContractRegistry** makes it easy to discover protocol contracts dynamically — no need to hardcode addresses that may change between testnet iterations
@@ -161,7 +161,7 @@ npm run test
 - Pre-built React hooks package for common Flare protocol interactions (FTSO reads, FDC submissions, FAssets operations) could accelerate dApp development
 - Example code for FAssets minting from a frontend perspective would be helpful — the current docs focus on CLI/backend usage
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Framer Motion
 - **Architecture**: Effect TS (full-stack effectful programming)
@@ -173,6 +173,6 @@ npm run test
 - **3D**: Three.js, React Three Fiber (globe visualization)
 - **Testing**: Vitest with Effect TestLayer
 
-## 📄 License
+##  License
 
 MIT
