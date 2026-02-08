@@ -6,6 +6,7 @@ Website -> https://sat-shield-eth-oxford.vercel.app
 
 SatShield is a **parametric insurance dApp** that uses Flare Network's enshrined data protocols to provide automated, trustless disaster insurance payouts. When real-world events (earthquakes, floods, droughts) exceed predefined thresholds, smart contracts automatically execute payouts — no claims process, no delays.
 
+
 ##  Hackathon Requirements Compliance
 
 ### MAIN TRACK — All Four Enshrined Protocols Used
@@ -69,6 +70,8 @@ SatShield is a **parametric insurance dApp** that uses Flare Network's enshrined
 - **Dynamic registry**: Contracts resolved via `FlareContractRegistry` — no hardcoded addresses
 
 ## Architecture
+
+Note on the Name: "Sat" stands for Satellite Data. SatShield protects users by verifying real-world disaster data (from geological and weather satellites) on-chain using the Flare Data Connector.
 
 ### Full-Stack Effect TS Architecture
 
