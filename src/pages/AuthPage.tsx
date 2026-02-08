@@ -95,7 +95,7 @@ export default function AuthPage() {
             <div className="absolute inset-0 blur-xl bg-primary/30" />
           </div>
           <h1 className="text-2xl font-bold font-serif">
-            Flare<span className="text-primary">Shield</span>
+            Sat<span className="text-primary">Shield</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Oracle-powered parametric insurance on Flare
@@ -108,21 +108,19 @@ export default function AuthPage() {
             <div className="flex rounded-lg bg-secondary/50 p-1">
               <button
                 onClick={() => { setMode('signin'); setFieldErrors({}); }}
-                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                  mode === 'signin'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${mode === 'signin'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => { setMode('signup'); setFieldErrors({}); }}
-                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                  mode === 'signup'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${mode === 'signup'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 Sign Up
               </button>
