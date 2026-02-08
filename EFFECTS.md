@@ -4,7 +4,7 @@ SatShield is a **parametric insurance dApp** on Flare Network. Every side effect
 
 ---
 
-## 🏆 Flare Hackathon — Requirements Compliance
+## Flare Hackathon — Requirements Compliance
 
 ### MAIN TRACK: Use data protocols on Flare blockchain in an innovative and world-changing way
 
