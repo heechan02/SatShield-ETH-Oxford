@@ -1,0 +1,13 @@
+project_id = "nxeqxtajlvvstsxexfbi"
+
+[functions.oracle-feed]
+verify_jwt = false
+
+[functions.backtest]
+verify_jwt = false
+
+[functions.premium-calculator]
+verify_jwt = false
+
+[functions.geocode]
+verify_jwt = false
