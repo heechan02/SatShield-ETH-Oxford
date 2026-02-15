@@ -4,6 +4,7 @@ import RiskPoolCard from '@/components/dashboard/RiskPoolCard';
 import { Shield, Link as LinkIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import FTSOPriceTicker from '@/components/shared/FTSOPriceTicker';
+import { BitcoinPriceWidget } from '@/components/BitcoinPriceWidget';
 import { useUserPolicies } from '@/hooks/usePolicies';
 import { useSatShieldContract } from '@/hooks/useSatShieldContract';
 
@@ -19,9 +20,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4">
-        {/* FTSO Price Ticker */}
-        <div className="mb-6">
+        {/* Price Tickers */}
+        <div className="mb-6 space-y-4">
           <FTSOPriceTicker />
+          <BitcoinPriceWidget variant="default" />
         </div>
 
         {/* Header */}

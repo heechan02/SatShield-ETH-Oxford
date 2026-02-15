@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { MapPin, DollarSign, Gauge, BarChart3, FileCheck, ArrowLeft, ArrowRight, Loader2, Wifi, TrendingUp, ShieldCheck, Database, ChevronDown, HelpCircle, Clock, CreditCard, Wallet, CheckCircle2 } from 'lucide-react';
+import { MapPin, DollarSign, Gauge, BarChart3, FileCheck, ArrowLeft, ArrowRight, Loader2, Wifi, TrendingUp, ShieldCheck, Database, ChevronDown, HelpCircle, Clock, CreditCard, Wallet, CheckCircle2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -17,7 +17,9 @@ import PayoutTierChart from './PayoutTierChart';
 import BasisRiskIndicator from './BasisRiskIndicator';
 import PolicyTermsSheet from './PolicyTermsSheet';
 import CrossChainPayment from './CrossChainPayment';
+import LightningPayment from './LightningPayment';
 import OracleBadge from '@/components/shared/OracleBadge';
+import axios from 'axios';
 import ContractExplorer from '@/components/shared/ContractExplorer';
 import TransactionModal from '@/components/shared/TransactionModal';
 import { riskPools, formatUSD, mockOracleData } from '@/lib/mockData';
@@ -75,8 +77,28 @@ export default function PolicyConfiguration() {
       : pool.triggerRange[0] + (pool.triggerRange[1] - pool.triggerRange[0]) * 0.4
   );
   const [showTxModal, setShowTxModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'c2flr' | 'xrp'>('c2flr');
+  const [paymentMethod, setPaymentMethod] = useState<'c2flr' | 'xrp' | 'lightning'>('c2flr');
   const [xrpPaymentVerified, setXrpPaymentVerified] = useState(false);
+  const [lightningPaymentVerified, setLightningPaymentVerified] = useState(false);
+
+  // Bitcoin price state
+  const [btcPrice, setBtcPrice] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchBTCPrice = async () => {
+      try {
+        const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+          params: { ids: 'bitcoin', vs_currencies: 'usd' },
+        });
+        setBtcPrice(response.data.bitcoin.usd);
+      } catch (err) {
+        console.error('Failed to fetch BTC price:', err);
+      }
+    };
+    fetchBTCPrice();
+    const interval = setInterval(fetchBTCPrice, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Coverage capacity check (Enhancement 8)
   const [contractCapacity, setContractCapacity] = useState<number | null>(null);
@@ -110,6 +132,8 @@ export default function PolicyConfiguration() {
   const premiumAmount = basePremiumAmount * (1 - durationDiscount) * (durationDays / 365);
   const premiumInFLR = flrPrice > 0 ? premiumAmount / flrPrice : 0;
   const premiumInXRP = xrpPrice > 0 ? premiumAmount / xrpPrice : 0;
+  const premiumInBTC = btcPrice > 0 ? premiumAmount / btcPrice : 0;
+  const premiumInSats = Math.round(premiumInBTC * 100_000_000);
 
   // Coverage limit validation (Enhancement 8)
   // Treat 0 or null capacity as "unknown" — don't block the user on empty testnet contracts
@@ -697,13 +721,16 @@ export default function PolicyConfiguration() {
                     <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                        <span className="text-xs text-muted-foreground">FTSO Live Price</span>
+                        <span className="text-xs text-muted-foreground">Live Prices</span>
                       </div>
                       <div className="text-right">
                         <span className="text-sm font-mono-data font-bold">${flrPrice.toFixed(4)}</span>
-                        <span className="text-[10px] text-muted-foreground ml-1">FLR/USD</span>
+                        <span className="text-[10px] text-muted-foreground ml-1">FLR</span>
                         {xrpPrice > 0 && (
-                          <span className="ml-2 text-sm font-mono-data">${xrpPrice.toFixed(4)} <span className="text-[10px] text-muted-foreground">XRP/USD</span></span>
+                          <span className="ml-2 text-sm font-mono-data">${xrpPrice.toFixed(4)} <span className="text-[10px] text-muted-foreground">XRP</span></span>
+                        )}
+                        {btcPrice > 0 && (
+                          <span className="ml-2 text-sm font-mono-data text-[#F7931A]">${btcPrice.toLocaleString(undefined, {maximumFractionDigits: 0})} <span className="text-[10px] text-muted-foreground">BTC</span></span>
                         )}
                       </div>
                     </div>
@@ -711,7 +738,7 @@ export default function PolicyConfiguration() {
                     {/* Payment Method Selector (Enhancement 4) */}
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground font-medium">Payment Method</p>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <button
                           onClick={() => setPaymentMethod('c2flr')}
                           className={`rounded-lg border p-3 text-left transition-all ${
@@ -746,6 +773,25 @@ export default function PolicyConfiguration() {
                             {premiumInXRP.toFixed(4)} XRP
                           </p>
                         </button>
+                        <button
+                          onClick={() => setPaymentMethod('lightning')}
+                          className={`relative rounded-lg border p-3 text-left transition-all ${
+                            paymentMethod === 'lightning'
+                              ? 'border-[#F7931A] bg-[#F7931A]/10'
+                              : 'border-border/50 bg-secondary/30 hover:border-[#F7931A]/30'
+                          }`}
+                        >
+                          <Badge variant="outline" className="absolute -top-2 right-2 text-[7px] border-[#F7931A]/30 text-[#F7931A]">
+                            Lightning
+                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Zap className="h-4 w-4 text-[#F7931A] fill-[#F7931A]" />
+                            <span className="text-sm font-medium">BTC</span>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground mt-1">
+                            {premiumInSats.toLocaleString()} sats
+                          </p>
+                        </button>
                       </div>
                     </div>
 
@@ -758,6 +804,18 @@ export default function PolicyConfiguration() {
                         coverageAmount={coverageAmount}
                         triggerValue={triggerValue}
                         onPaymentVerified={() => setXrpPaymentVerified(true)}
+                      />
+                    )}
+
+                    {/* Bitcoin Lightning Payment */}
+                    {paymentMethod === 'lightning' && (
+                      <LightningPayment
+                        premiumUSD={premiumAmount}
+                        btcPrice={btcPrice}
+                        poolType={pool.id}
+                        coverageAmount={coverageAmount}
+                        triggerValue={triggerValue}
+                        onPaymentVerified={() => setLightningPaymentVerified(true)}
                       />
                     )}
 
@@ -779,7 +837,8 @@ export default function PolicyConfiguration() {
                       disabled={
                         !hasWallet ||
                         mintStatus === 'pending' || mintStatus === 'confirming' ||
-                        (paymentMethod === 'xrp' && !xrpPaymentVerified)
+                        (paymentMethod === 'xrp' && !xrpPaymentVerified) ||
+                        (paymentMethod === 'lightning' && !lightningPaymentVerified)
                       }
                       className="w-full h-12 text-base glow-primary"
                     >
@@ -792,6 +851,8 @@ export default function PolicyConfiguration() {
                         ? 'Confirming on Coston2...'
                         : paymentMethod === 'xrp' && !xrpPaymentVerified
                         ? 'Verify XRP Payment First'
+                        : paymentMethod === 'lightning' && !lightningPaymentVerified
+                        ? '⚡ Pay Lightning Invoice First'
                         : !hasWallet
                         ? 'Connect Wallet to Mint'
                         : '🛡️ Mint Policy on Flare'}
@@ -800,7 +861,9 @@ export default function PolicyConfiguration() {
                     <p className="text-xs text-center text-muted-foreground">
                       {paymentMethod === 'c2flr'
                         ? `By minting, you send ${premiumInFLR.toFixed(0)} C2FLR as premium to the SatShieldPolicy contract on Coston2.`
-                        : 'Your XRP payment has been verified via FDC Payment attestation. The policy will be minted on Flare.'
+                        : paymentMethod === 'xrp'
+                        ? 'Your XRP payment has been verified via FDC Payment attestation. The policy will be minted on Flare.'
+                        : `Your Lightning payment of ${premiumInSats.toLocaleString()} sats has been verified. The policy will be minted on Flare.`
                       }
                     </p>
                   </CardContent>
