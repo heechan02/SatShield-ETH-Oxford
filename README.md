@@ -2,7 +2,7 @@
 
 **Top 6 Finalist @ ETH Oxford 2026**
 
-Website: https://sat-shield-eth-oxford-git-feature-bi-3f77f5-heechan02s-projects.vercel.app
+- Website: https://sat-shield-eth-oxford-git-feature-bi-3f77f5-heechan02s-projects.vercel.app
 
 Decentralized parametric insurance platform powered by Flare's FTSO oracles and Bitcoin Lightning Network payments.
 
