@@ -27,15 +27,28 @@ SatShield provides **instant, automated insurance payouts** based on real-world 
 npm install
 ```
 
-### **2. Setup Environment**
-
-Copy `.env.example` to `.env`:
+### **2. Setup Lightning Network**
 
 ```bash
-VITE_LNBITS_DEMO_MODE=true
+# Run the automated setup script
+./scripts/setup-lnbits.sh
+
+# This will:
+# - Start LNBits with FakeWallet (testing mode)
+# - Generate real BOLT11 Lightning invoices
+# - Give you an API key
 ```
 
-### **3. Run**
+### **3. Configure Environment**
+
+```bash
+# Copy .env.example to .env
+cp .env.example .env
+
+# Update .env with your LNBits API key from http://localhost:5001
+```
+
+### **4. Run SatShield**
 
 ```bash
 npm run dev
@@ -43,45 +56,90 @@ npm run dev
 
 Open **http://localhost:8080**
 
+> 💡 **Note**: See [LIGHTNING_SETUP.md](./LIGHTNING_SETUP.md) for production deployment with real Lightning nodes (LND, Core Lightning, LNDhub)
+
 ---
 
-## ⚡ Bitcoin Lightning Integration
+## ⚡ Bitcoin Lightning Network Integration
+
+**Real Lightning Network payments** powered by LNBits and BOLT11 protocol.
 
 ### **Key Features:**
 
-- ✅ **3 Payment Methods**: C2FLR, XRP (cross-chain), and **Bitcoin Lightning**
+- ✅ **Production-Ready**: Real BOLT11 invoice generation via LNBits
+- ✅ **Multiple Backends**: Supports LND, Core Lightning, LNDhub, FakeWallet
 - ✅ **Real-time BTC Price**: Live Bitcoin price from CoinGecko API
-- ✅ **Lightning Invoices**: BOLT11 invoice generation with QR codes
-- ✅ **Instant Verification**: 3-second payment detection via polling
-- ✅ **Satoshi Conversion**: Premium calculated in sats automatically
+- ✅ **QR Code Payments**: Scannable with any Lightning wallet
+- ✅ **Payment Detection**: 3-second polling for instant confirmation
+- ✅ **Satoshi Conversion**: Automatic premium calculation in sats
+- ✅ **3 Payment Methods**: C2FLR, XRP (cross-chain), and Bitcoin Lightning
 
-### **Payment Flow:**
+### **Lightning Payment Flow:**
 
+```
 1. User configures policy (location, coverage, trigger)
+   ↓
 2. Selects "Bitcoin Lightning" payment option
-3. Invoice generated with QR code (e.g., 1.28M sats)
-4. User pays from Lightning wallet (HTLC.me, Phoenix, etc.)
-5. Payment detected in ~3 seconds
-6. Policy minted on Flare blockchain
+   ↓
+3. SatShield → LNBits: Generate BOLT11 invoice
+   ↓
+4. Display QR code + invoice string (e.g., 1.28M sats)
+   ↓
+5. User scans with Lightning wallet (Phoenix, HTLC.me, etc.)
+   ↓
+6. Payment sent via Lightning Network
+   ↓
+7. SatShield polls LNBits every 3 seconds
+   ↓
+8. Payment confirmed → Policy minted on Flare blockchain
+```
 
-### **Implementation:**
+### **Architecture:**
 
-- **`useLightningInvoice.ts`** - Lightning payment hook with polling
-- **`LightningPayment.tsx`** - Payment UI with QR code display
+```
+┌──────────────┐
+│  SatShield   │ (React Frontend)
+└──────┬───────┘
+       │ HTTP API
+       ▼
+┌──────────────┐
+│   LNBits     │ (Wallet Manager)
+└──────┬───────┘
+       │ Connects to...
+       ▼
+┌────────────────────────┐
+│  Lightning Backend     │
+│  • FakeWallet (dev)    │
+│  • LND (production)    │
+│  • Core Lightning      │
+│  • LNDhub (custodial)  │
+└────────────────────────┘
+```
+
+### **Implementation Files:**
+
+- **`useLightningInvoice.ts`** - Lightning payment hook with polling logic
+- **`LightningPayment.tsx`** - Payment UI component with QR display
 - **`BitcoinPriceWidget.tsx`** - Live BTC/USD price widget
-- **Demo Mode** - Simulates payments for presentations (auto-pays in 5s)
+- **`scripts/setup-lnbits.sh`** - Automated LNBits setup
+- **`LIGHTNING_SETUP.md`** - Complete setup guide
 
-### **Try It:**
+### **Quick Setup:**
 
 ```bash
-# Demo Mode (default)
-VITE_LNBITS_DEMO_MODE=true
+# 1. Run setup script (starts LNBits with FakeWallet)
+./scripts/setup-lnbits.sh
 
-# Real Lightning (requires Docker + LNBits)
+# 2. Get API key from http://localhost:5001
+# 3. Update .env with your key
+
+# 4. Configure for real Lightning
 VITE_LNBITS_DEMO_MODE=false
-VITE_LNBITS_URL=http://localhost:5000
-VITE_LNBITS_API_KEY=your_key_here
+VITE_LNBITS_URL=http://localhost:5001
+VITE_LNBITS_API_KEY=your_invoice_read_key
 ```
+
+> 📖 **Full Documentation**: See [LIGHTNING_SETUP.md](./LIGHTNING_SETUP.md) for production deployment
 
 ---
 
@@ -200,9 +258,58 @@ Premium: $1,250 USD
 
 ---
 
-## 🎭 Demo Mode
+## 🐳 Lightning Network Setup
 
-Perfect for presentations when LNBits server is unavailable:
+### **Automated Setup (Recommended)**
+
+Use the provided setup script for instant Lightning integration:
+
+```bash
+./scripts/setup-lnbits.sh
+```
+
+**What it does:**
+1. Starts LNBits in Docker with your choice of backend:
+   - **FakeWallet** (testing with real BOLT11 invoices)
+   - **VoidWallet** (Bitcoin testnet)
+   - **Custom** (your own LND/CLN node)
+2. Configures port 5001
+3. Provides step-by-step instructions
+
+### **Manual Setup**
+
+```bash
+# Start LNBits with FakeWallet (for testing)
+docker run -d -p 5001:5000 --name lnbits \
+  -e LNBITS_BACKEND_WALLET_CLASS=FakeWallet \
+  lnbits/lnbits:latest
+
+# Get API key from http://localhost:5001
+# Update .env with the Invoice/read key
+```
+
+### **Testing Payments**
+
+With FakeWallet:
+1. Generate invoice in SatShield
+2. Invoice appears in LNBits dashboard
+3. Manually mark as "paid" in LNBits
+4. SatShield detects payment in ~3 seconds
+
+### **Production Deployment**
+
+For **real Bitcoin payments**, connect LNBits to:
+- **LND node** (self-hosted Lightning node)
+- **Core Lightning** (CLN node)
+- **LNDhub** (custodial, easiest for production)
+
+See [LIGHTNING_SETUP.md](./LIGHTNING_SETUP.md) for detailed instructions.
+
+---
+
+## 🎭 Demo Mode (Presentation Only)
+
+For presentations when LNBits is unavailable:
 
 ```bash
 # Enable in .env
@@ -210,42 +317,23 @@ VITE_LNBITS_DEMO_MODE=true
 ```
 
 **What happens:**
-
 - Shows "Demo Mode" badge
-- Generates fake Lightning invoice (looks real)
-- Auto-pays after 5 seconds
-- Perfect for hackathon demos!
+- Generates fake invoice (not real BOLT11)
+- Auto-confirms after 5 seconds
+- **Use only for presentations**
 
----
-
-## 🐳 Real Lightning Setup (Optional)
-
-For real Bitcoin Lightning payments:
-
-```bash
-# 1. Run LNBits locally with Docker
-docker run -d -p 5000:5000 --name lnbits lnbits/lnbits:latest
-
-# 2. Get API key from http://localhost:5000
-# - Click "Add wallet"
-# - Click "API info"
-# - Copy "Invoice/read key"
-
-# 3. Update .env
-VITE_LNBITS_URL=http://localhost:5000
-VITE_LNBITS_API_KEY=your_key_here
-VITE_LNBITS_DEMO_MODE=false
-```
+**⚠️ Not recommended for Summer of Bitcoin** - use FakeWallet instead for real Lightning invoice generation!
 
 ---
 
 ## 🏆 Achievements
 
 - ✅ **Top 6 Finalist** at ETH Oxford 2024
-- ✅ **Real Lightning Network** integration
+- ✅ **Real Lightning Network** integration (BOLT11, LNBits)
+- ✅ **Production-ready** Lightning backend support (LND, CLN, LNDhub)
 - ✅ **FTSO Oracle** integration on Flare
 - ✅ **Cross-chain payments** (XRP via FDC)
-- ✅ **Production-ready** error handling
+- ✅ **Automated setup** scripts for Lightning infrastructure
 - ✅ **Beautiful UI/UX** with Tailwind + shadcn
 
 ---
@@ -253,28 +341,36 @@ VITE_LNBITS_DEMO_MODE=false
 ## 📝 Environment Variables
 
 ```bash
-# Bitcoin Lightning (Demo Mode - Default)
-VITE_LNBITS_DEMO_MODE=true
-
-# Bitcoin Lightning (Real Mode)
+# Bitcoin Lightning Network (Production - Default)
 VITE_LNBITS_DEMO_MODE=false
-VITE_LNBITS_URL=http://localhost:5000
-VITE_LNBITS_API_KEY=your_lnbits_key
+VITE_LNBITS_URL=http://localhost:5001
+VITE_LNBITS_API_KEY=your_invoice_read_key
+
+# Demo Mode (Presentations Only)
+# VITE_LNBITS_DEMO_MODE=true
 
 # Supabase (optional)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_key
 ```
 
+**Getting your LNBits API key:**
+1. Run `./scripts/setup-lnbits.sh`
+2. Open `http://localhost:5001`
+3. Click wallet → "API info"
+4. Copy "Invoice/read key" (NOT admin key!)
+
 ---
 
-## 🎥 Demo Video Flow
+## 🎥 Demo Flow
 
-1. **Dashboard** - Show Bitcoin price alongside FTSO prices
-2. **Configure** - Select wildfire policy, $50K coverage
-3. **Payment** - Click Bitcoin Lightning, show QR code
-4. **Pay** - Demo mode auto-pays in 5 seconds
-5. **Mint** - Policy minted on Flare blockchain
+1. **Setup** - Run `./scripts/setup-lnbits.sh` to start Lightning Network
+2. **Dashboard** - Show Bitcoin price alongside FTSO prices
+3. **Configure** - Select wildfire policy, $50K coverage
+4. **Payment** - Click Bitcoin Lightning, generate real BOLT11 invoice with QR code
+5. **Pay** - Mark as paid in LNBits (or scan with Lightning wallet)
+6. **Detect** - SatShield polls and detects payment in ~3 seconds
+7. **Mint** - Policy minted on Flare blockchain with Lightning payment proof
 
 ---
 

@@ -410,7 +410,7 @@ export default function PolicyConfiguration() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <div className="text-xs text-muted-foreground mt-1">
                         {isPremiumLoading ? (
                           <Skeleton className="h-3 w-48 mt-1" />
                         ) : (
@@ -428,7 +428,7 @@ export default function PolicyConfiguration() {
                             )}
                           </>
                         )}
-                      </p>
+                      </div>
                     </div>
 
                     {/* Premium Breakdown Panel */}

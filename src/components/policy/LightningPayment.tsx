@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Loader2, CheckCircle2, Copy, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { QRCodeSVG } from 'react-qr-code';
+import QRCode from 'react-qr-code';
 import { useLightningInvoice } from '@/hooks/useLightningInvoice';
 import { useLightningInvoiceDemo } from '@/hooks/useLightningInvoiceDemo';
 import { useToast } from '@/hooks/use-toast';
@@ -32,6 +32,7 @@ export default function LightningPayment({
   const { toast } = useToast();
   const premiumBTC = btcPrice > 0 ? premiumUSD / btcPrice : 0;
   const premiumSats = Math.round(premiumBTC * 100_000_000);
+  const hasNotifiedPayment = useRef(false);
 
   // Use demo mode if enabled, otherwise use real LNBits
   const realInvoice = useLightningInvoice();
@@ -46,9 +47,10 @@ export default function LightningPayment({
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle payment success
+  // Handle payment success (only once)
   useEffect(() => {
-    if (isPaid && invoice) {
+    if (isPaid && invoice && !hasNotifiedPayment.current) {
+      hasNotifiedPayment.current = true;
       toast({
         title: 'Payment Received! ⚡',
         description: 'Your Lightning payment has been confirmed.',
@@ -158,11 +160,10 @@ export default function LightningPayment({
               {/* QR Code */}
               <div className="flex justify-center py-3">
                 <div className="bg-white p-3 rounded-lg border-2 border-[#F7931A]/20">
-                  <QRCodeSVG
+                  <QRCode
                     value={invoice.toUpperCase()}
                     size={200}
                     level="M"
-                    includeMargin={false}
                   />
                 </div>
               </div>
