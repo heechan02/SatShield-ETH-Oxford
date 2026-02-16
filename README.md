@@ -2,8 +2,8 @@
 
 > Built for the Flare Network Hackathon · Main Track + Bonus Track
 
-Website (Hackathon) -> https://sat-shield-eth-oxford.vercel.app
-Website (Bitcoin Integration) -> https://sat-shield-eth-oxford-git-feature-bi-3f77f5-heechan02s-projects.vercel.app
+- Website (Hackathon) -> https://sat-shield-eth-oxford.vercel.app
+- Website (Bitcoin Integration) -> https://sat-shield-eth-oxford-git-feature-bi-3f77f5-heechan02s-projects.vercel.app
 
 SatShield is a **parametric insurance dApp** that uses Flare Network's enshrined data protocols to provide automated, trustless disaster insurance payouts. When real-world events (earthquakes, floods, droughts) exceed predefined thresholds, smart contracts automatically execute payouts — no claims process, no delays.
 
