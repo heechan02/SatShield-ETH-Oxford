@@ -384,12 +384,6 @@ VITE_SUPABASE_ANON_KEY=your_supabase_key
 
 ---
 
-## 👥 Team
-
-Built by the SatShield team for ETH Oxford 2024 and Summer of Bitcoin.
-
----
-
 ## 📄 License
 
 MIT
